@@ -2,6 +2,10 @@ package provider
 
 import (
 	"context"
+	"net/http"
+	"time"
+
+	"github.com/eabrouwer3/terraform-provider-airbyte/internal/apiclient"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -26,11 +30,18 @@ func init() {
 func New(version string) func() *schema.Provider {
 	return func() *schema.Provider {
 		p := &schema.Provider{
+			Schema: map[string]*schema.Schema{
+				"host_url": {
+					Type:        schema.TypeString,
+					Optional:    true,
+					DefaultFunc: schema.EnvDefaultFunc("AIRBYTE_URL", "http://localhost:8000"),
+				},
+			},
 			DataSourcesMap: map[string]*schema.Resource{
-				"scaffolding_data_source": dataSourceScaffolding(),
+				"airbyte_workspace": dataSourceWorkspace(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"scaffolding_resource": resourceScaffolding(),
+				"airbyte_workspace": resourceWorkspace(),
 			},
 		}
 
@@ -40,18 +51,13 @@ func New(version string) func() *schema.Provider {
 	}
 }
 
-type apiClient struct {
-	// Add whatever fields, client or connection info, etc. here
-	// you would need to setup to communicate with the upstream
-	// API.
-}
-
 func configure(version string, p *schema.Provider) func(context.Context, *schema.ResourceData) (any, diag.Diagnostics) {
-	return func(context.Context, *schema.ResourceData) (any, diag.Diagnostics) {
-		// Setup a User-Agent for your API client (replace the provider name for yours):
-		// userAgent := p.UserAgent("terraform-provider-scaffolding", version)
-		// TODO: myClient.UserAgent = userAgent
+	return func(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
+		host := d.Get("host_url").(string)
 
-		return &apiClient{}, nil
+		return &apiclient.ApiClient{
+			HTTPClient: &http.Client{Timeout: 10 * time.Second},
+			HostURL:    host,
+		}, nil
 	}
 }

@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-scaffolding
+module github.com/eabrouwer3/terraform-provider-airbyte
 
 go 1.18
 
