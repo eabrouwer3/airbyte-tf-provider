@@ -1,7 +1,11 @@
 package provider
 
 import (
+	"fmt"
+	"github.com/eabrouwer3/terraform-provider-airbyte/internal/apiclient"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -9,7 +13,9 @@ import (
 
 func TestAccResourceWorkspace_basic(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccResourceWorkspaceDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceWorkspace_basic,
@@ -26,6 +32,7 @@ func TestAccResourceWorkspace_basic(t *testing.T) {
 
 func TestAccResourceWorkspace_complex(t *testing.T) {
 	resource.UnitTest(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -58,6 +65,25 @@ func TestAccResourceWorkspace_complex(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccResourceWorkspaceDestroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*apiclient.ApiClient)
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type == "airbyte_workspace" {
+			_, err := client.GetWorkspaceById(rs.Primary.ID)
+			if err == nil {
+				return fmt.Errorf("Workspace (%s) still exists.", rs.Primary.ID)
+			}
+
+			if !strings.Contains(err.Error(), "Could not find configuration for STANDARD_WORKSPACE") {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 const testAccResourceWorkspace_basic = `

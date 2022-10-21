@@ -9,6 +9,7 @@ import (
 
 func TestAccDataSourceWorkspace_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -28,6 +29,7 @@ func TestAccDataSourceWorkspace_basic(t *testing.T) {
 
 func TestAccDataSourceWorkspace_complex(t *testing.T) {
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
