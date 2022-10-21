@@ -135,16 +135,20 @@ func resourceToWorkspace(d *schema.ResourceData) apiclient.CommonWorkspaceFields
 		workspace.Email = v.(string)
 	}
 	if v, ok := d.GetOk("anonymous_data_collection"); ok {
-		workspace.AnonymousDataCollection = v.(bool)
+		val := v.(bool)
+		workspace.AnonymousDataCollection = &val
 	}
 	if v, ok := d.GetOk("news"); ok {
-		workspace.News = v.(bool)
+		val := v.(bool)
+		workspace.News = &val
 	}
 	if v, ok := d.GetOk("security_updates"); ok {
-		workspace.SecurityUpdates = v.(bool)
+		val := v.(bool)
+		workspace.SecurityUpdates = &val
 	}
 	if v, ok := d.GetOk("display_setup_wizard"); ok {
-		workspace.DisplaySetupWizard = v.(bool)
+		val := v.(bool)
+		workspace.DisplaySetupWizard = &val
 	}
 
 	notifInput, notifOk := d.GetOk("notification_config")

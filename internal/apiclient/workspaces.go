@@ -17,11 +17,11 @@ type WorkspaceNameBody struct {
 
 type CommonWorkspaceFields struct {
 	Email                   string         `json:"email,omitempty"`
-	AnonymousDataCollection bool           `json:"anonymousDataCollection,omitempty"`
-	News                    bool           `json:"news,omitempty"`
-	SecurityUpdates         bool           `json:"securityUpdates,omitempty"`
+	AnonymousDataCollection *bool          `json:"anonymousDataCollection,omitempty"`
+	News                    *bool          `json:"news,omitempty"`
+	SecurityUpdates         *bool          `json:"securityUpdates,omitempty"`
 	Notifications           []Notification `json:"notifications,omitempty"`
-	DisplaySetupWizard      bool           `json:"displaySetupWizard,omitempty"`
+	DisplaySetupWizard      *bool          `json:"displaySetupWizard,omitempty"`
 }
 
 type Workspace struct {
@@ -30,11 +30,11 @@ type Workspace struct {
 	CommonWorkspaceFields
 	CustomerId           string         `json:"customerId"`
 	Slug                 string         `json:"slug"`
-	InitialSetupComplete bool           `json:"initialSetupComplete"`
-	SecurityUpdates      bool           `json:"securityUpdates"`
+	InitialSetupComplete *bool          `json:"initialSetupComplete,omitempty"`
+	SecurityUpdates      *bool          `json:"securityUpdates,omitempty"`
 	Notifications        []Notification `json:"notifications"`
-	FirstCompletedSync   bool           `json:"firstCompletedSync"`
-	FeedbackDone         bool           `json:"feedbackDone"`
+	FirstCompletedSync   *bool          `json:"firstCompletedSync,omitempty"`
+	FeedbackDone         *bool          `json:"feedbackDone,omitempty"`
 	DefaultGeography     string         `json:"defaultGeography"`
 }
 
@@ -66,8 +66,6 @@ func (c *ApiClient) GetWorkspaceById(workspaceId string) (*Workspace, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(string(rb))
 
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/workspaces/get", c.HostURL, BASE_URL), strings.NewReader(string(rb)))
 	if err != nil {

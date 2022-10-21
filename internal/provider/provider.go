@@ -38,10 +38,12 @@ func New(version string) func() *schema.Provider {
 				},
 			},
 			DataSourcesMap: map[string]*schema.Resource{
-				"airbyte_workspace": dataSourceWorkspace(),
+				"airbyte_workspace":        dataSourceWorkspace(),
+				"airbyte_sourcedefinition": dataSourceSourceDefinition(),
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"airbyte_workspace": resourceWorkspace(),
+				"airbyte_workspace":        resourceWorkspace(),
+				"airbyte_sourcedefinition": resourceSourceDefinition(),
 			},
 		}
 
@@ -56,7 +58,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		host := d.Get("host_url").(string)
 
 		return &apiclient.ApiClient{
-			HTTPClient: &http.Client{Timeout: 10 * time.Second},
+			HTTPClient: &http.Client{Timeout: 120 * time.Second},
 			HostURL:    host,
 		}, nil
 	}

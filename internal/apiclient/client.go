@@ -18,6 +18,34 @@ type HealthCheckResponse struct {
 	available bool
 }
 
+type CommonErrorResponseFields struct {
+	Message            string `json:"message"`
+	exceptionClassName string
+	exceptionStack     []string
+}
+
+type Response422 struct {
+	CommonErrorResponseFields
+	ValidationErrors []ValidationError `json:"validationErrors"`
+}
+
+type ValidationError struct {
+	PropertyPath string `json:"propertyPath"`
+	InvalidValue string `json:"invalidValue"`
+	Message      string `json:"message"`
+}
+
+type Response404 struct {
+	Id string `json:"id"`
+	CommonErrorResponseFields
+	rootCauseExceptionClassName string
+	rootCauseExceptionStack     []string
+}
+
+type Response500 struct {
+	CommonErrorResponseFields
+}
+
 func (c *ApiClient) check() error {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%s/health", c.HostURL, BASE_URL), nil)
 	if err != nil {
@@ -53,6 +81,25 @@ func (c *ApiClient) doRequest(req *http.Request) ([]byte, error) {
 	}
 
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
+		if res.StatusCode == http.StatusUnprocessableEntity {
+			r := Response422{}
+			err := json.Unmarshal(body, &r)
+			if err == nil {
+				body, _ = json.Marshal(r)
+			}
+		} else if res.StatusCode == http.StatusNotFound {
+			r := Response404{}
+			err := json.Unmarshal(body, &r)
+			if err == nil {
+				body, _ = json.Marshal(r)
+			}
+		} else if res.StatusCode == http.StatusInternalServerError {
+			r := Response500{}
+			err := json.Unmarshal(body, &r)
+			if err == nil {
+				body, _ = json.Marshal(r)
+			}
+		}
 		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
 	}
 

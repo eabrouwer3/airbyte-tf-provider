@@ -13,3 +13,11 @@ output "workspace_by_id" {
 output "workspace_by_slug" {
   value = data.airbyte_workspace.by_slug
 }
+
+data "airbyte_sourcedefinition" "zendesk" {
+  id = "c8630570-086d-4a40-99ae-ea5b18673071"
+}
+
+output "sourcedefinition_zendesk" {
+  value = data.airbyte_sourcedefinition.zendesk
+}
