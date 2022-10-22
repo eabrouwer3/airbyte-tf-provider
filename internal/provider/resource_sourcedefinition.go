@@ -267,12 +267,12 @@ func resourceSourceDefinitionRead(ctx context.Context, d *schema.ResourceData, m
 
 	sdId := d.Id()
 
-	w, err := c.GetSourceDefinitionById(sdId)
+	sd, err := c.GetSourceDefinitionById(sdId)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	err = FlattenSourceDefinition(d, w)
+	err = FlattenSourceDefinition(d, sd)
 	if err != nil {
 		return diag.FromErr(err)
 	}

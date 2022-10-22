@@ -44,6 +44,7 @@ func New(version string) func() *schema.Provider {
 			ResourcesMap: map[string]*schema.Resource{
 				"airbyte_workspace":        resourceWorkspace(),
 				"airbyte_sourcedefinition": resourceSourceDefinition(),
+				"airbyte_source":           resourceSource(),
 			},
 		}
 
